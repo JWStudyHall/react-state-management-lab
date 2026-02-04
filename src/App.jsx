@@ -87,52 +87,61 @@ function App() {
     },
   ]);
 
+  const totalStrength = team.reduce(
+    (sum, fighter) => sum + fighter.strength,
+    0,
+  );
+  const totalAgility = team.reduce((sum, fighter) => sum + fighter.agility, 0);
+
   const handleAddFighter = (selectedFighter) => {
-    if (money >= selectedFighter.price) {
-      setTeam([...team]);
-    } else {
+    if (money < selectedFighter.price) {
       console.log("You do not have enough money.");
       return;
     }
+
+    const newTeam = [...team, selectedFighter];
+    setTeam(newTeam);
+
+    const remainingfFighters = fighters.filter((fighter) => {
+      return fighter.id !== selectedFighter.id;
+    });
+    setFighters(remainingfFighters);
+    setMoney(money - selectedFighter.price);
   };
 
-  const newTeam = [...team, selectedFighter];
-  setTeam(newTeam);
-
-  const remainingfFighters = fighters.filter((fighter) => {
-    return fighter.id !== selectedFighter.id;
-  });
-  setFighters(remainingfFighters);
-  const handleRemoveFighter = (selectedFighter) => {};
+  const handleRemoveFighter = (selectedFighter) => {
+    const updatedTeam = team.filter(
+      (fighter) => fighter.id !== selectedFighter.id,
+    );
+    setTeam(updatedTeam);
+    const updatedFighters = [...fighters, selectedFighter];
+    setFighters(updatedFighters);
+    setMoney(money + selectedFighter.price);
+  };
 
   return (
     <>
-      <section>
-        <div>
-          <h1>Team</h1>
-          <p>Total Strength:</p>
-          <p>Total Agility:</p>
-        </div>
-        <ul>
-          {team.map((fighter) => (
-            <li key={fighter.id}>
-              <p>Fighter: {fighter.name}</p>
-              <p>Price: {fighter.price}</p>
-              <p>Strength: {fighter.strength}</p>
-              <p>Agility: {fighter.agility}</p>
-              <img src={fighter.img} alt={fighter.name} />
-              <button onClick={() => handleRemoveFighter(fighter)}>
-                Remove
-              </button>
-            </li>
-          ))}
-        </ul>
-      </section>
-      <section>
         <div>
           <h1>Zombie Fighters</h1>
           <h2> Money: ${money} </h2>
-        </div>
+      <section>
+          <h1>Team</h1>
+          <p>Total Strength:{totalStrength}</p>
+          <p>Total Agility:{totalAgility}</p>
+          <ul>
+            {team.map((fighter) => (
+              <li key={fighter.id}>
+                <p>Fighter: {fighter.name}</p>
+                <p>Price: {fighter.price}</p>
+                <p>Strength: {fighter.strength}</p>
+                <p>Agility: {fighter.agility}</p>
+                <img src={fighter.img} alt={fighter.name} />
+                <button onClick={() => handleRemoveFighter(fighter)}>
+                  Remove
+                </button>
+              </li>
+            ))}
+          </ul>
         <ul>
           <h2>Available Fighters</h2>
           {fighters.map((fighter) => (
@@ -147,8 +156,8 @@ function App() {
           ))}
         </ul>
       </section>
+          </div>
     </>
   );
 }
-
 export default App;
